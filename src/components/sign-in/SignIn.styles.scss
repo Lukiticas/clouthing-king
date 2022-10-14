@@ -1,0 +1,24 @@
+.sign-in {
+  display: flex;
+  flex-direction: column;
+  max-width: 35rem;
+  padding: 1rem;
+  &__title {
+    margin-block-end: 0.8rem;
+  }
+
+  &__inputs {
+    &:nth-child(2) {
+      margin-bottom: 2rem;
+    }
+
+    &__buttons {
+      display: flex;
+      flex-flow: row wrap;
+
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+  }
+}

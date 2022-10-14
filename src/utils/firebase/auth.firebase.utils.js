@@ -5,6 +5,7 @@ import {
   signInWithRedirect,
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
 import { CreateUserDocumentFromAuth } from "./firestore.firebase.utils";
 
@@ -13,6 +14,10 @@ provider.setCustomParameters({
   prompt: "select_account",
 });
 
+const auth = getAuth();
+const signInGPopUp = () => signInWithPopup(auth, provider);
+const signInGRedirect = () => signInWithRedirect(auth, provider);
+
 const createAuthWithEmailAndPassword = async (displayName, email, password) => {
   if (!email || !password || !displayName) return;
 
@@ -20,9 +25,5 @@ const createAuthWithEmailAndPassword = async (displayName, email, password) => {
   const userRef = await CreateUserDocumentFromAuth(user, displayName);
   return userRef;
 };
-
-const auth = getAuth();
-const signInGPopUp = () => signInWithPopup(auth, provider);
-const signInGRedirect = () => signInWithRedirect(auth, provider);
 
 export { signInGPopUp, signInGRedirect, createAuthWithEmailAndPassword, auth };

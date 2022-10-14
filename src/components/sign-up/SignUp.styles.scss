@@ -1,9 +1,20 @@
 .sign-up {
+  position: relative;
   display: flex;
   flex-direction: column;
-  max-width: 380px;
+  max-width: 35rem;
+  padding: 1rem;
 
   &__title {
-    margin-block-start: 0.8rem;
+    margin-block-end: 0.8rem;
+  }
+
+  &__success {
+    position: absolute;
+    top: 18%;
+    right: 0;
+    color: olivedrab;
+    font-weight: 600;
+    letter-spacing: 0.2rem;
   }
 }

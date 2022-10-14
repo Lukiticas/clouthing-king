@@ -1,17 +1,15 @@
 .button-component {
-  min-width: 10rem;
-  width: auto;
-  height: 3.12rem;
-  letter-spacing: 0.31rem;
+  min-width: 15rem;
+  letter-spacing: 0.12rem;
   line-height: 3.12rem;
-  padding: 0 2rem 0 2rem;
+  padding: 0.2rem 1.8rem;
   font-size: 0.9rem;
+
   background-color: var(--primary);
   color: var(--secundary);
 
   text-transform: uppercase;
   font-family: "Open Sans Condensed";
-  font-weight: bolder;
 
   border: none;
   cursor: pointer;
@@ -20,6 +18,8 @@
   justify-content: center;
 
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+
+  transition: all 200ms ease;
 
   &:hover {
     background-color: var(--secundary);
