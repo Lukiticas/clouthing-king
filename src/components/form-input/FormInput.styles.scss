@@ -1,0 +1,50 @@
+$sub-color: grey;
+$main-color: black;
+
+.form-input {
+  position: relative;
+  margin: 45px 0;
+
+  input[type="password"] {
+    letter-spacing: 0.8em;
+  }
+
+  &__input {
+    background-color: transparent;
+    color: $sub-color;
+    font-size: 1.1rem;
+    padding: 0.6rem 0.8rem 0.6rem 0.5rem;
+    display: block;
+    width: 100%;
+    border: none;
+    border-radius: 0;
+    border-bottom: 0.05rem solid $sub-color;
+    margin: 2rem 0;
+    outline: none;
+
+    &:not(:placeholder-shown),
+    &:focus {
+      & + label {
+        transform: translateY(-160%);
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+    }
+
+    &::placeholder {
+      opacity: 0;
+    }
+  }
+
+  &__label {
+    color: $sub-color;
+    font-size: 16px;
+    font-weight: normal;
+    position: absolute;
+    pointer-events: none;
+    transition: 300ms ease all;
+
+    bottom: 30%;
+    left: 0.5rem;
+  }
+}

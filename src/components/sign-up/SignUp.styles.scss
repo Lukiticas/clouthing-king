@@ -1,0 +1,9 @@
+.sign-up {
+  display: flex;
+  flex-direction: column;
+  max-width: 380px;
+
+  &__title {
+    margin-block-start: 0.8rem;
+  }
+}
