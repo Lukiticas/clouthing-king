@@ -1,13 +1,12 @@
 import "./firebase.utils";
+import { CreateUserDocumentFromAuth } from "./firestore.firebase.utils";
 import {
   getAuth,
   signInWithPopup,
   signInWithRedirect,
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
 } from "firebase/auth";
-import { CreateUserDocumentFromAuth } from "./firestore.firebase.utils";
 
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({

@@ -4,10 +4,13 @@ import { auth, signInGPopUp } from "../../utils/firebase/auth.firebase.utils";
 import ButtonComponent from "../../components/button-component/Button.component";
 import FormInput from "../../components/form-input/FormInput.component";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import FormHeader from "../form-header/FormHeader.component";
+import { CreateUserDocumentFromAuth } from "../../utils/firebase/firestore.firebase.utils";
 
 const logGoogleUser = async () => {
   const { user } = await signInGPopUp();
   const userDocRef = await CreateUserDocumentFromAuth(user);
+  return userDocRef;
 };
 
 const logWithEmail = async (email, password) => {
@@ -21,69 +24,78 @@ const signInValues = {
 
 const SignIn = () => {
   const [signInData, setSignInData] = useState(signInValues);
-  const [error, setError] = useState({ password: false, user: false });
   const { email, password } = signInData;
 
-  const handleChange = (target) => {
-    const { value, name } = target;
+  const [error, setError] = useState({ password: false, email: false });
+
+  const handleChange = ({ value, name }) => {
     setSignInData((el) => ({ ...el, [name]: value }));
-    setError({ user: false, password: false });
+    setError(name, true);
   };
 
-  const handleError = (payload) => {
-    setError((prevEl) => ({ ...prevEl, [payload]: true }));
-    console.log(error);
+  const handleError = (value, reset = false) => {
+    setError((prevEl) => ({ ...prevEl, [value]: reset ? false : true }));
+  };
+
+  const handleLoginWithGoogle = (event) => {
+    event.preventDefault();
+    logGoogleUser().then((data) => console.log(data));
   };
 
   const handleLogin = (event) => {
     event.preventDefault();
-    logWithEmail(email, password).catch((error) => {
-      console.log(error);
-      switch (error.code) {
-        case "auth/user-not-found":
+
+    logWithEmail(email, password)
+      .then((data) => console.log(data))
+      .catch((error) => {
+        if (error.code == "auth/user-not-found") {
           handleError("user");
-          break;
-        case "auth/wrong-password":
+        }
+
+        if (error.code == "auth/wrong-password") {
           handleError("password");
-          break;
-        default:
-          console.log({ error });
-          break;
-      }
-      return;
-    });
+        }
+
+        console.log(`unsuspected error: ${error}`);
+      });
   };
+
+  const inputs = [
+    {
+      label: "Email",
+      value: email,
+      type: "text",
+      name: "email",
+      placeholder: "Email",
+      required: true,
+      onChange: ({ target }) => handleChange(target),
+      isOnError: error.email,
+      errorMessage: "User not found",
+    },
+    {
+      label: "Password",
+      value: password,
+      type: "password",
+      name: "password",
+      placeholder: "Password",
+      required: true,
+      onChange: ({ target }) => handleChange(target),
+      isOnError: error.password || error.email,
+      errorMessage: error.password ? "wrong password" : "",
+    },
+  ];
 
   return (
     <div className="sign-in">
-      <h2 className="sign-in__title">I already have an account</h2>
-      <span className="sign-in__span">
-        Sign in with your email and password
-      </span>
+      <FormHeader
+        title={"I already have an account"}
+        subtitle="Sign in with your email and password"
+      />
 
       <form className="sign-in__inputs" onSubmit={handleLogin}>
-        <FormInput
-          isOnError={error.user}
-          errorMessage="User not found"
-          value={email}
-          onChange={({ target }) => handleChange(target)}
-          name="email"
-          label="email"
-          placeholder="email"
-          type="email"
-          required
-        />
-        <FormInput
-          isOnError={error.password || error.user}
-          errorMessage={error.password ? "wrong password" : ""}
-          value={password}
-          onChange={({ target }) => handleChange(target)}
-          name="password"
-          label="password"
-          placeholder="password"
-          type="password"
-          required
-        />
+        {inputs.map((el, idx) => (
+          <FormInput key={idx + el.name} {...el} />
+        ))}
 
         <div className="sign-in__inputs__buttons">
           <ButtonComponent
@@ -97,7 +109,7 @@ const SignIn = () => {
             colors={{ primary: "#4285f4", secundary: "white" }}
             hasOutline={true}
             type="button"
-            onClick={handleLogin}
+            onClick={handleLoginWithGoogle}
           >
             Sign in with Google
           </ButtonComponent>
