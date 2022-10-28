@@ -1,32 +1,31 @@
 import "./SignIn.styles.scss";
+
 import { useState } from "react";
-import { auth, signInGPopUp } from "../../utils/firebase/auth.firebase.utils";
+
+import {
+  SignInUserWithEmailAndPassword,
+  logGoogleUser,
+} from "../../utils/firebase/auth.firebase.utils";
+
 import ButtonComponent from "../../components/button-component/Button.component";
 import FormInput from "../../components/form-input/FormInput.component";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import FormHeader from "../form-header/FormHeader.component";
-import { CreateUserDocumentFromAuth } from "../../utils/firebase/firestore.firebase.utils";
-
-const logGoogleUser = async () => {
-  const { user } = await signInGPopUp();
-  const userDocRef = await CreateUserDocumentFromAuth(user);
-  return userDocRef;
-};
-
-const logWithEmail = async (email, password) => {
-  return signInWithEmailAndPassword(auth, email, password);
-};
 
 const signInValues = {
   email: "",
   password: "",
 };
 
+const errorValues = {
+  password: false,
+  email: false,
+};
+
 const SignIn = () => {
   const [signInData, setSignInData] = useState(signInValues);
-  const { email, password } = signInData;
+  const [error, setError] = useState(errorValues);
 
-  const [error, setError] = useState({ password: false, email: false });
+  const { email, password } = signInData;
 
   const handleChange = ({ value, name }) => {
     setSignInData((el) => ({ ...el, [name]: value }));
@@ -37,27 +36,30 @@ const SignIn = () => {
     setError((prevEl) => ({ ...prevEl, [value]: reset ? false : true }));
   };
 
-  const handleLoginWithGoogle = (event) => {
-    event.preventDefault();
-    logGoogleUser().then((data) => console.log(data));
+  const handleLoginWithGoogle = async () => {
+    await logGoogleUser();
   };
 
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
-
-    logWithEmail(email, password)
-      .then((data) => console.log(data))
-      .catch((error) => {
-        if (error.code == "auth/user-not-found") {
-          handleError("user");
-        }
-
-        if (error.code == "auth/wrong-password") {
+    try {
+      await SignInUserWithEmailAndPassword(email, password);
+    } catch (error) {
+      switch (error.code) {
+        case "auth/user-not-found":
+          handleError("email");
+          console.log("erro no email");
+          break;
+        case "auth/wrong-password":
           handleError("password");
-        }
-
-        console.log(`unsuspected error: ${error}`);
-      });
+          break;
+        case "auth/invalid-email":
+          handleError("email");
+          break;
+        default:
+          console.log(`unsuspected error: ${error}`);
+      }
+    }
   };
 
   const inputs = [

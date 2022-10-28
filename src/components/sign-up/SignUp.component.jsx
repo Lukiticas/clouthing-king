@@ -1,8 +1,12 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { userContext } from "../../contexts/user.context";
+
 import { createAuthWithEmailAndPassword } from "../../utils/firebase/auth.firebase.utils";
+
 import ButtonComponent from "../button-component/button.component";
 import FormHeader from "../form-header/FormHeader.component";
 import FormInput from "../form-input/FormInput.component";
+
 import "./SignUp.styles.scss";
 
 const signDataValues = {
@@ -12,25 +16,22 @@ const signDataValues = {
   confirmPassword: "",
 };
 
+const errorValues = {
+  email: false,
+  displayName: false,
+  password: false,
+  confirmPassword: false,
+};
+
 const SignUp = () => {
-  const [userCreated, setUserCreated] = useState(false);
   const [signData, setSignData] = useState(signDataValues);
+  const [userCreated, setUserCreated] = useState(false);
+
+  const [error, setError] = useState(errorValues);
+
+  const { setCurrentUser } = useContext(userContext);
+
   const { displayName, email, password, confirmPassword } = signData;
-
-  const [error, setError] = useState({
-    email: false,
-    displayName: false,
-    password: false,
-    confirmPassword: false,
-  });
-
-  useEffect(() => {
-    const removeUserCreatedMessage = setTimeout(() => {
-      setUserCreated(false);
-    }, 2000);
-
-    return () => clearTimeout(removeUserCreatedMessage);
-  }, [userCreated]);
 
   const inputs = [
     {
@@ -86,6 +87,7 @@ const SignUp = () => {
 
     if (error[name]) {
       handleError(name, true);
+      return;
     }
   };
 
@@ -95,6 +97,7 @@ const SignUp = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     if (password !== confirmPassword) {
       handleError("password");
       handleError("confirmPassword");
@@ -103,15 +106,24 @@ const SignUp = () => {
 
     try {
       await createAuthWithEmailAndPassword(displayName, email, password);
+
       setUserCreated(true);
       setSignData(signDataValues);
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
         handleError("email");
       }
-      console.log(`error signing up user: ${{ error }} `);
+      console.log(`error signing up user: ${error} `);
     }
   };
+
+  useEffect(() => {
+    const removeUserCreatedMessage = setTimeout(() => {
+      setUserCreated(false);
+    }, 2000);
+
+    return () => clearTimeout(removeUserCreatedMessage);
+  }, [userCreated]);
 
   return (
     <div className="sign-up">
